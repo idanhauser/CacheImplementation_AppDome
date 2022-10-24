@@ -16,7 +16,7 @@ public class LruCache<K, V> {
 
     // Time unit like Seconds, Minutes, Hours etc.
     // Map for key and DoublyLinkedList node mapping
-    private final HashMap<K, DoublyLinkedListNode<K, V>> nodeMap;
+    private final HashMap<K, CacheElement<K, V>> nodeMap;
     CacheList<K, V> cacheList;
     // Current size of LRUCache
     private int currentSize;
@@ -54,7 +54,7 @@ public class LruCache<K, V> {
                         deleteKey = new ArrayList<>((nodeMap.size() / 2) + 1);
                         Set<K> keySet = nodeMap.keySet();
                         for (K key : keySet) {
-                            DoublyLinkedListNode<K, V> value = nodeMap.get(key);
+                            CacheElement<K, V> value = nodeMap.get(key);
                             if (value.isExpired()) {
                                 deleteKey.add(key);
                                 System.out.println("CacheCleaner Running. Found an expired object in the Cache : "
@@ -89,13 +89,13 @@ public class LruCache<K, V> {
         synchronized (nodeMap) {
             System.out.println("Adding new object..." + value);
             if (nodeMap.containsKey(key)) {
-                DoublyLinkedListNode<K, V> node = nodeMap.get(key);
+                CacheElement<K, V> node = nodeMap.get(key);
                 node.value = value;
                 cacheList.bringItemToFront(node);
                 nodeMap.put(key, node);
 
             } else {
-                DoublyLinkedListNode<K, V> nodeToInsert = new DoublyLinkedListNode<>(key, value, timeUnit, expireTime);
+                CacheElement<K, V> nodeToInsert = new CacheElement<>(key, value, timeUnit, expireTime);
                 if (currentSize < capacity) {
                     cacheList.addItemToFront(nodeToInsert);
                     nodeMap.put(key, nodeToInsert);
@@ -116,7 +116,7 @@ public class LruCache<K, V> {
     public V get(K key) {
         synchronized (nodeMap) {
             if (nodeMap.containsKey(key)) {
-                DoublyLinkedListNode<K, V> node = nodeMap.get(key);
+                CacheElement<K, V> node = nodeMap.get(key);
                 cacheList.bringItemToFront(node);
                 nodeMap.put(key, node);
                 return node.value;
@@ -129,7 +129,7 @@ public class LruCache<K, V> {
     public void delete(K key) {
         synchronized (nodeMap) {
             if (nodeMap.containsKey(key)) {
-                DoublyLinkedListNode<K, V> node = nodeMap.get(key);
+                CacheElement<K, V> node = nodeMap.get(key);
                 cacheList.removeNode(node);
                 nodeMap.remove(key);
             }

@@ -2,11 +2,11 @@ package cache;
 
 public class CacheList<K, V> {
     // First node of DoublyLinkedList
-    DoublyLinkedListNode<K, V> start;
+    CacheElement<K, V> start;
     // Last node of DoublyLinkedList
-    DoublyLinkedListNode<K, V> end;
+    CacheElement<K, V> end;
 
-    public CacheList(DoublyLinkedListNode<K, V> start, DoublyLinkedListNode<K, V> end) {
+    public CacheList(CacheElement<K, V> start, CacheElement<K, V> end) {
         this.start = start;
         this.end = end;
     }
@@ -23,7 +23,7 @@ public class CacheList<K, V> {
     }
 
     // Add node in front of queue
-    public void addItemToFront(DoublyLinkedListNode<K, V> node) {
+    public void addItemToFront(CacheElement<K, V> node) {
         node.next = start;
         node.prev = null;
         if (start != null) {
@@ -34,9 +34,9 @@ public class CacheList<K, V> {
             end = node;
         }
     }
-    public void removeNode(DoublyLinkedListNode<K, V> node) {
-        DoublyLinkedListNode<K, V> prevNode = node.prev;
-        DoublyLinkedListNode<K, V> nextNode = node.next;
+    public void removeNode(CacheElement<K, V> node) {
+        CacheElement<K, V> prevNode = node.prev;
+        CacheElement<K, V> nextNode = node.next;
 
         if (prevNode != null) {
             prevNode.next = nextNode;
@@ -52,7 +52,7 @@ public class CacheList<K, V> {
     }
 
     // Reorder existing node to front of queue
-    public void bringItemToFront(DoublyLinkedListNode<K, V> node) {
+    public void bringItemToFront(CacheElement<K, V> node) {
         removeNode(node);
         addItemToFront(node);
     }

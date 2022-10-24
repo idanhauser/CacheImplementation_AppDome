@@ -3,17 +3,17 @@ package cache;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class DoublyLinkedListNode<K, V> {
+public class CacheElement<K, V> {
     // Node of DoublyLinkedList
-    DoublyLinkedListNode<K, V>  prev;
-    DoublyLinkedListNode<K, V>  next;
+    CacheElement<K, V> prev;
+    CacheElement<K, V> next;
     Date dateOfExpiration;
     K key;
     V value;
     private TimeUnit timeUnit;
     private int expireTime;
 
-    public DoublyLinkedListNode(K key, V value, TimeUnit timeUnit, int expireTime) {
+    public CacheElement(K key, V value, TimeUnit timeUnit, int expireTime) {
         this.key = key;
         this.value = value;
         this.timeUnit = timeUnit;
