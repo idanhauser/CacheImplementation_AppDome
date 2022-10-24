@@ -32,21 +32,26 @@ public class CacheList<K, V> {
             end = node;
         }
     }
-
-    // Reorder existing node to front of queue
-    public void bringItemToFront(DoublyLinkedListNode<K, V> node) {
+    public void removeNode(DoublyLinkedListNode<K, V> node) {
         DoublyLinkedListNode<K, V> prevNode = node.prev;
         DoublyLinkedListNode<K, V> nextNode = node.next;
+
         if (prevNode != null) {
             prevNode.next = nextNode;
         } else {
             start = nextNode;
         }
+
         if (nextNode != null) {
             nextNode.prev = prevNode;
         } else {
             end = prevNode;
         }
+    }
+
+    // Reorder existing node to front of queue
+    public void bringItemToFront(DoublyLinkedListNode<K, V> node) {
+        removeNode(node);
         addItemToFront(node);
     }
 

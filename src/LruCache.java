@@ -124,5 +124,14 @@ public class LruCache<K, V> {
         }
     }
 
+    public void delete(K key) {
+        synchronized (nodeMap) {
+            if (nodeMap.containsKey(key)) {
+                DoublyLinkedListNode<K, V> node = nodeMap.get(key);
+                nodeMap.remove(key);
+            }
+        }
+    }
+
 
 }
