@@ -130,6 +130,7 @@ public class LruCache<K, V> {
         synchronized (nodeMap) {
             if (nodeMap.containsKey(key)) {
                 DoublyLinkedListNode<K, V> node = nodeMap.get(key);
+                cacheList.removeNode(node);
                 nodeMap.remove(key);
             }
         }
