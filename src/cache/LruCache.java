@@ -57,16 +57,14 @@ public class LruCache<K, V> {
                             CacheElement<K, V> value = nodeMap.get(key);
                             if (value.isExpired()) {
                                 deleteKey.add(key);
-                                System.out.println("CacheCleaner Running. Found an expired object in the Cache : "
-                                        + value.value);
+                                System.out.println("CacheCleaner Running. Found an expired object in the Cache : "+ value.value);
                             }
                         }
                     }
 
                     for (K key : deleteKey) {
                         synchronized (nodeMap) {
-                            System.out.println("CacheCleaner removed an expired object from the Cache : "
-                                    + nodeMap.get(key).value);
+                          System.out.println("CacheCleaner removed an expired object from the Cache : "+ nodeMap.get(key).value);
                             nodeMap.remove(key);
                         }
 
@@ -92,22 +90,21 @@ public class LruCache<K, V> {
                 CacheElement<K, V> node = nodeMap.get(key);
                 node.value = value;
                 cacheList.bringItemToFront(node);
-                nodeMap.put(key, node);
+                //nodeMap.put(key, node); // commented - if it contains, i dont need to put it again.
 
             } else {
                 CacheElement<K, V> nodeToInsert = new CacheElement<>(key, value, timeUnit, expireTime);
                 if (currentSize < capacity) {
                     cacheList.addItemToFront(nodeToInsert);
                     nodeMap.put(key, nodeToInsert);
-
                     currentSize++;
                 } else {
-                    cacheList.removeLastNode();
                     nodeMap.remove(cacheList.end.key);
+                    cacheList.removeLastNode();
                     cacheList.addItemToFront(nodeToInsert);
                     nodeMap.put(key, nodeToInsert);
-
                 }
+                nodeMap.put(key, nodeToInsert);
             }
         }
     }
@@ -130,8 +127,10 @@ public class LruCache<K, V> {
         synchronized (nodeMap) {
             if (nodeMap.containsKey(key)) {
                 CacheElement<K, V> node = nodeMap.get(key);
-                cacheList.removeNode(node);
+                System.out.println("Deleting new object..." + node.value);
                 nodeMap.remove(key);
+                cacheList.removeNode(node);
+
             }
         }
     }
