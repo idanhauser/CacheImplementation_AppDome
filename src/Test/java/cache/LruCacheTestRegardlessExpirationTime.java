@@ -4,20 +4,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LruCacheTest {
+class LruCacheTestRegardlessExpirationTime {
     private static final int CAPACITY = 3;
     private static final int EXPIRE_TIME = 1;
-    private static final TimeUnit TIME_UNIT = TimeUnit.MINUTES;
+    private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 
     private LruCache<String, String> lruCacheUnderTest;
 
@@ -26,7 +22,7 @@ class LruCacheTest {
         lruCacheUnderTest = new LruCache<>(CAPACITY, EXPIRE_TIME, TIME_UNIT);
     }
 
-    /* BASIC CACHE OPERATION TEST */
+    /* BASIC CACHE OPERATION TEST TO REGARDLESS EXPIRE TIME */
 
     @Test
 
@@ -49,7 +45,6 @@ class LruCacheTest {
     }
 
 
-
     @Test
     @DisplayName("addDataToCacheToTheNumberOfSize_WhenAddOneMoreData_ThenLeastRecentlyDataWillEvict")
     void addDataToCacheToTheNumberOfSize_WhenAddOneMoreData_ThenLeastRecentlyDataWillEvict() {
@@ -59,6 +54,33 @@ class LruCacheTest {
         lruCacheUnderTest.put("4", "test4");
         assertNull(lruCacheUnderTest.get("1"), "requesting from cache key '1' after inserting 3 other keys, should be null.");
     }
+
+    @Test
+    void addBunchOfDataToCacheExceedsTheNumberOfSize_WhenGetData_ThenIsEqualWithCacheElement() {
+        final int BUNCH_SIZE = CAPACITY * 1000;
+        for (int i = 0; i < BUNCH_SIZE; i++) {
+            lruCacheUnderTest.put(String.valueOf(i), "test" + i);
+        }
+        IntStream.range(CAPACITY * 1000 - CAPACITY, CAPACITY).forEach(i -> assertEquals("test" + i, lruCacheUnderTest.get(String.valueOf(i)), "requesting from cache key '" + i + "' should respond with 'test" + i + "'"));
+    }
+
+    @Test
+    void getDataFromCache_WhenCacheIsEmpty_ShouldReturnNull() {
+        assertNull(lruCacheUnderTest.get("1"), "requesting from cache key '1' when cache is empty, should be null.");
+        assertNull(lruCacheUnderTest.get("2"), "requesting from cache key '2' when cache is empty, should be null.");
+    }
+
+    @Test
+    void deleteDataFromCache_WhenCacheIsEmpty_ShouldDoNone() {
+        lruCacheUnderTest.delete("2");
+        assertNull(lruCacheUnderTest.get("2"), "requesting from cache key '2' when cache is empty, should be null.");
+        lruCacheUnderTest.put("2", "test2");
+        assertEquals("test2", lruCacheUnderTest.get("2"), "requesting from cache key '2' should respond with 'test3'");
+        lruCacheUnderTest.delete("2");
+        assertNull(lruCacheUnderTest.get("2"), "requesting from cache key '2' when cache is empty, should be null.");
+
+    }
+
 
     @Test
     @DisplayName("addSomeDataToCache_ChaneTheValueForSameKey_ThenIsEqualWithCacheElement")
@@ -112,22 +134,5 @@ class LruCacheTest {
         assertEquals("test4", lruCacheUnderTest.get("4"), "requesting from cache key '4' should respond with 'test4'");
     }
 
-    @Test
-    public void runMultiThreadTask_WhenPutDataInConcurrentToCache_ThenNoDataLost() throws Exception {
-        final int size = 3;
-        final ExecutorService executorService = Executors.newFixedThreadPool(5);
 
-        CountDownLatch countDownLatch = new CountDownLatch(size);
-        try {
-            IntStream.range(0, size).<Runnable>mapToObj(key -> () -> {
-                lruCacheUnderTest.put(String.valueOf(key), "value" + String.valueOf(key));
-                countDownLatch.countDown();
-            }).forEach(executorService::submit);
-            countDownLatch.await();
-        } finally {
-            executorService.shutdown();
-        }
-        //assertEquals(lruCacheUnderTest.cacheList.getCount(), size);
-        IntStream.range(0, size).forEach(i -> assertEquals("value" + i, lruCacheUnderTest.get(String.valueOf(i))));
-    }
 }
