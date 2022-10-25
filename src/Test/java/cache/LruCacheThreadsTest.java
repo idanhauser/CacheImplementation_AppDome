@@ -16,7 +16,7 @@ public class LruCacheThreadsTest {
     private static final int EXPIRE_TIME = 1;
     private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 
-    private LruCache<String, String> lruCacheUnderTest;
+    private LruCache<Integer, String> lruCacheUnderTest;
 
     @BeforeEach
     void setup() {
@@ -30,7 +30,7 @@ public class LruCacheThreadsTest {
         CountDownLatch countDownLatch = new CountDownLatch(CAPACITY);
         try {
             IntStream.range(0, CAPACITY).<Runnable>mapToObj(key -> () -> {
-                lruCacheUnderTest.put(String.valueOf(key), "value" + String.valueOf(key));
+                lruCacheUnderTest.put(key, "value" + String.valueOf(key));
                 countDownLatch.countDown();
             }).forEach(executorService::submit);
             countDownLatch.await();
@@ -38,6 +38,7 @@ public class LruCacheThreadsTest {
             executorService.shutdown();
         }
 
-        IntStream.range(0, CAPACITY).forEach(i -> assertEquals("value" + i, lruCacheUnderTest.get(String.valueOf(i))));
+        IntStream.range(0, CAPACITY).forEach(i -> assertEquals("value" + i, lruCacheUnderTest.get(i),
+                "requesting from cache key '" + i + "' should respond with 'test" + i + "'"));
     }
 }
