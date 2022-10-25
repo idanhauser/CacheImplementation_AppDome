@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LruCacheTestRegardlessExpirationTime {
     private static final int CAPACITY = 3;
-    private static final int EXPIRE_TIME = 1;
+    private static final int EXPIRE_TIME = 0;
     private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 
     private LruCache<String, String> lruCacheUnderTest;
@@ -232,5 +232,23 @@ class LruCacheTestRegardlessExpirationTime {
                 "requesting from cache key '4' should respond with 'test4'");
     }
 
+    @Test
+    void addSomeDataToCache_WhenGetDataWithSleep_ThenIsEqualWithCacheElement() throws InterruptedException {
+        lruCacheUnderTest.put("1", "test1");
+        lruCacheUnderTest.put("2", "test2");
+        lruCacheUnderTest.put("3", "test3");
+
+    System.out.println("TESTING: SLEEPING FOR " + CAPACITY*CAPACITY*10000 + " " + TimeUnit.MILLISECONDS.name());
+    Thread.sleep(CAPACITY*CAPACITY*10000);
+
+        assertEquals("test1", lruCacheUnderTest.get("1"),
+                "requesting from cache key '1' should respond with 'test1'");
+
+        assertEquals("test2", lruCacheUnderTest.get("2"),
+                "requesting from cache key '2' should respond with 'test3'");
+
+        assertEquals("test3", lruCacheUnderTest.get("3"),
+                "requesting from cache key '3' should respond with 'test3'");
+    }
 
 }

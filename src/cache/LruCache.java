@@ -94,6 +94,8 @@ public class LruCache<K, V> {
     // Add an item to LRUCache
     public void put(K key, V value) {
         synchronized (nodeMap) {
+            Objects.requireNonNull(key, "key == null");
+            Objects.requireNonNull(value, "value == null");
             System.out.println("Adding new object..." + value);
             if (nodeMap.containsKey(key)) {
                 CacheElement<K, V> node = nodeMap.get(key);
@@ -120,6 +122,7 @@ public class LruCache<K, V> {
 
     // Get an item from LRUCache
     public V get(K key) {
+        Objects.requireNonNull(key, "key == null");
         synchronized (nodeMap) {
             if (nodeMap.containsKey(key)) {
                 CacheElement<K, V> node = nodeMap.get(key);
@@ -133,6 +136,7 @@ public class LruCache<K, V> {
     }
 
     public void delete(K key) {
+        Objects.requireNonNull(key, "key == null");
         synchronized (nodeMap) {
             if (nodeMap.containsKey(key)) {
                 CacheElement<K, V> node = nodeMap.get(key);

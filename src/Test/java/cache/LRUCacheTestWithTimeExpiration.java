@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class LRUCacheTestWithTimeExpiration {
 
     private static final int CAPACITY = 3;
-    private static final int EXPIRE_TIME = 5;
-    private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
+    private static final int EXPIRE_TIME = 1;
+    private static final TimeUnit TIME_UNIT = TimeUnit.MINUTES;
     private static int sleepTime;
     private LruCache<String, String> lruCacheUnderTest;
 
@@ -60,7 +60,6 @@ public class LRUCacheTestWithTimeExpiration {
 
 
     @Test
-
     void addSomeDataToCache_WaitForExpirationTime_AddMoreData_ThenEqualWithValidCacheElement() throws InterruptedException {
         lruCacheUnderTest.put("1", "test1");
         lruCacheUnderTest.put("2", "test2");
@@ -89,7 +88,6 @@ public class LRUCacheTestWithTimeExpiration {
         assertEquals("test4", lruCacheUnderTest.get("4"),
                 "requesting from cache key '4' should respond with 'test4'");
     }
-
 
 
 }

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LruCacheThreadsTest {
     private static final int CAPACITY = 100;
-    private static final int EXPIRE_TIME = 1;
+    private static final int EXPIRE_TIME = 0;
     private static final TimeUnit TIME_UNIT = TimeUnit.HOURS;
 
     private LruCache<Integer, String> lruCacheUnderTest;
