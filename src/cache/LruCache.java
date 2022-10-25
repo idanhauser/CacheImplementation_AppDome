@@ -57,14 +57,14 @@ public class LruCache<K, V> {
                             CacheElement<K, V> value = nodeMap.get(key);
                             if (value.isExpired()) {
                                 deleteKey.add(key);
-                                System.out.println("CacheCleaner Running. Found an expired object in the Cache : "+ value.value);
+                                System.out.println("CacheCleaner Running. Found an expired object in the Cache : " + value.value);
                             }
                         }
                     }
 
                     for (K key : deleteKey) {
                         synchronized (nodeMap) {
-                          System.out.println("CacheCleaner removed an expired object from the Cache : "+ nodeMap.get(key).value);
+                            System.out.println("CacheCleaner removed an expired object from the Cache : " + nodeMap.get(key).value);
                             nodeMap.remove(key);
                         }
 
@@ -127,7 +127,8 @@ public class LruCache<K, V> {
         synchronized (nodeMap) {
             if (nodeMap.containsKey(key)) {
                 CacheElement<K, V> node = nodeMap.get(key);
-                System.out.println("Deleting new object..." + node.value);
+                System.out.println("Deleting object..." + node.value);
+                currentSize--;
                 nodeMap.remove(key);
                 cacheList.removeNode(node);
 
