@@ -22,7 +22,7 @@ class LruCacheTestRegardlessExpirationTime {
         lruCacheUnderTest = new LruCache<>(CAPACITY, EXPIRE_TIME, TIME_UNIT);
     }
 
-    /* BASIC CACHE OPERATION TEST TO REGARDLESS EXPIRE TIME */
+    /* BASIC CACHE OPERATION TESTs REGARDLESS EXPIRE TIME */
 
     @Test
     @DisplayName("addSomeDataToCache_WhenGetData_ThenIsEqualWithCacheElement")
@@ -104,6 +104,46 @@ class LruCacheTestRegardlessExpirationTime {
 
     }
 
+    @Test
+    void addDataToCache_DeleteAllData_AddOtherData_WhenGetData_ThenIsEqualWithCacheElement() {
+        lruCacheUnderTest.put("1", "test1");
+        lruCacheUnderTest.put("2", "test2");
+        lruCacheUnderTest.put("3", "test3");
+
+        assertEquals("test1", lruCacheUnderTest.get("1"),
+                "requesting from cache key '1' should respond with 'test1'");
+
+        assertEquals("test2", lruCacheUnderTest.get("2"),
+                "requesting from cache key '2' should respond with 'test3'");
+
+        assertEquals("test3", lruCacheUnderTest.get("3"),
+                "requesting from cache key '3' should respond with 'test3'");
+
+        lruCacheUnderTest.delete("1");
+        lruCacheUnderTest.delete("2");
+        lruCacheUnderTest.delete("3");
+        assertNull(lruCacheUnderTest.get("1"),
+                "requesting from cache key '1' after deleting it, should be null.");
+
+        assertNull(lruCacheUnderTest.get("2"),
+                "requesting from cache key '2' after deleting it, should be null.");
+
+        assertNull(lruCacheUnderTest.get("3"),
+                "requesting from cache key '3' after deleting it, should be null.");
+
+        lruCacheUnderTest.put("4", "test4");
+        lruCacheUnderTest.put("5", "test5");
+        lruCacheUnderTest.put("6", "test6");
+
+        assertEquals("test4", lruCacheUnderTest.get("4"),
+                "requesting from cache key '4' should respond with 'test4'");
+
+        assertEquals("test5", lruCacheUnderTest.get("5"),
+                "requesting from cache key '5' should respond with 'test5'");
+
+        assertEquals("test6", lruCacheUnderTest.get("6"),
+                "requesting from cache key '6' should respond with 'test6'");
+    }
 
     @Test
     @DisplayName("addSomeDataToCache_ChaneTheValueForSameKey_ThenIsEqualWithCacheElement")
