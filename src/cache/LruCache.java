@@ -22,6 +22,10 @@ public class LruCache<K, V> {
     private int currentSize;
 
     public LruCache(int capacity, int expireTime, TimeUnit timeUnit) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("capacity <= 0");
+        }
+
         currentSize = 0;
         this.expireTime = expireTime;
         this.timeUnit = timeUnit;
@@ -29,57 +33,62 @@ public class LruCache<K, V> {
         nodeMap = new HashMap<>();
         cacheList = new CacheList<>(null, null);
 
-        switch (this.timeUnit) {
-            case SECONDS:
-                this.sleepTime = expireTime * 1000;
-                break;
-            case MINUTES:
-                this.sleepTime = expireTime * 60000;
-                break;
-            case HOURS:
-                this.sleepTime = expireTime * 3600000;
-                break;
-            default://MILLISECONDS
-                this.sleepTime = expireTime;
-                break;
-        }
 
-        Thread threadCleaner = new Thread(() -> {
-            List<K> deleteKey;
+        if (expireTime > 0) {
+            switch (this.timeUnit) {
+                case SECONDS:
+                    this.sleepTime = expireTime * 1000;
+                    break;
+                case MINUTES:
+                    this.sleepTime = expireTime * 60000;
+                    break;
+                case HOURS:
+                    this.sleepTime = expireTime * 3600000;
+                    break;
+                default://MILLISECONDS
+                    this.sleepTime = expireTime;
+                    break;
+            }
 
-            try {
-                while (true) {
-                    System.out.println("CacheCleaner scanning for expired objects...");
-                    synchronized (nodeMap) {
-                        deleteKey = new ArrayList<>((nodeMap.size() / 2) + 1);
-                        Set<K> keySet = nodeMap.keySet();
-                        for (K key : keySet) {
-                            CacheElement<K, V> value = nodeMap.get(key);
-                            if (value.isExpired()) {
-                                deleteKey.add(key);
-                                System.out.println("CacheCleaner Running. Found an expired object in the Cache : " + value.value);
+            Thread threadCleaner = new Thread(() -> {
+                List<K> deleteKey;
+
+                try {
+                    while (true ) {
+                        System.out.println("CacheCleaner scanning for expired objects...");
+                        synchronized (nodeMap) {
+                            deleteKey = new ArrayList<>((nodeMap.size() / 2) + 1);
+                            Set<K> keySet = nodeMap.keySet();
+                            for (K key : keySet) {
+                                CacheElement<K, V> value = nodeMap.get(key);
+                                if (value.isExpired()) {
+                                    deleteKey.add(key);
+                                    System.out.println("CacheCleaner Running. Found an expired object in the Cache : " + value.value);
+                                }
                             }
                         }
-                    }
 
-                    for (K key : deleteKey) {
-                        synchronized (nodeMap) {
-                            System.out.println("CacheCleaner removed an expired object from the Cache : " + nodeMap.get(key).value);
-                            nodeMap.remove(key);
+                        for (K key : deleteKey) {
+                            synchronized (nodeMap) {
+                                System.out.println("CacheCleaner removed an expired object from the Cache : " + nodeMap.get(key).value);
+                                nodeMap.remove(key);
+                            }
+
+                            Thread.yield();
                         }
 
-                        Thread.yield();
+                        Thread.sleep(sleepTime);
                     }
-
-                    Thread.sleep(sleepTime);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+            });
 
-        threadCleaner.setPriority(Thread.MIN_PRIORITY);
-        threadCleaner.start();
+            threadCleaner.setPriority(Thread.MIN_PRIORITY);
+            threadCleaner.start();
+        } else {
+            sleepTime = 0;
+        }
     }
 
     // Add an item to LRUCache
