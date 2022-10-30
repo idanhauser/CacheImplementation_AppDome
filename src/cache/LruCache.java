@@ -54,7 +54,7 @@ public class LruCache<K, V> {
                 List<K> deleteKey;
 
                 try {
-                    while (true ) {
+                    while (true) {
                         System.out.println("CacheCleaner scanning for expired objects...");
                         synchronized (nodeMap) {
                             deleteKey = new ArrayList<>((nodeMap.size() / 2) + 1);
@@ -71,7 +71,10 @@ public class LruCache<K, V> {
                         for (K key : deleteKey) {
                             synchronized (nodeMap) {
                                 System.out.println("CacheCleaner removed an expired object from the Cache : " + nodeMap.get(key).value);
+                                currentSize--;
+                                cacheList.removeNode(nodeMap.get(key));
                                 nodeMap.remove(key);
+
                             }
 
                             Thread.yield();
@@ -84,8 +87,10 @@ public class LruCache<K, V> {
                 }
             });
 
-            threadCleaner.setPriority(Thread.MIN_PRIORITY);
-            threadCleaner.start();
+            if (expireTime > 0) {
+                threadCleaner.setPriority(Thread.MIN_PRIORITY);
+                threadCleaner.start();
+            }
         } else {
             sleepTime = 0;
         }

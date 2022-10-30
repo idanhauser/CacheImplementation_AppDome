@@ -6,12 +6,15 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-        LruCache<String, Integer> lru = new LruCache<String, Integer>(3, 5, TimeUnit.HOURS);
+        LruCache<String, Integer> lru = new LruCache<String, Integer>(3, 1, TimeUnit.SECONDS);
 
         lru.put(String.valueOf(1), 2);
         lru.put(String.valueOf(2), 2 * 2);
         lru.put(String.valueOf(3), 3 * 2);
-
+        Thread.sleep(10000);
+        lru.put(String.valueOf(4), 4 * 2);
+        lru.put(String.valueOf(5), 5 * 2);
+        lru.put(String.valueOf(6), 6 * 2);
 
 
 
