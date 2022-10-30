@@ -89,6 +89,7 @@ public class LruCache<K, V> {
 
             if (expireTime > 0) {
                 threadCleaner.setPriority(Thread.MIN_PRIORITY);
+                threadCleaner.setName("threadCleaner");
                 threadCleaner.start();
             }
         } else {
